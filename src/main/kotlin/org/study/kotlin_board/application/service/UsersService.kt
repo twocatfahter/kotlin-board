@@ -1,5 +1,6 @@
 package org.study.kotlin_board.application.service
 
+import jakarta.persistence.EntityManagerFactory
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -13,6 +14,7 @@ import org.study.kotlin_board.infrastructure.repository.UsersRepository
 @Service
 @Transactional(readOnly = true)
 class UsersService(
+    private val entityManagerFactory: EntityManagerFactory,
     private val usersRepository: UsersRepository,
     private val passwordEncoder: PasswordEncoder,
 ) {
@@ -64,5 +66,9 @@ class UsersService(
         if (usersRepository.existsByEmail(email)) {
             throw CustomException.DuplicateEmailException("이미 사용중인 이메일입니다.")
         }
+    }
+
+    fun existsByEmail(email: String): Boolean {
+        return usersRepository.existsByEmail(email)
     }
 }

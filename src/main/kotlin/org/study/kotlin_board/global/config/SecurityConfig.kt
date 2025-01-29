@@ -21,7 +21,8 @@ class SecurityConfig {
                     .requestMatchers(
                         "/api/v1/users/signup",
                         "/api/v1/users/login",
-                        "/h2-console",
+                        "/api/v1/users/**",
+                        "/h2-console/**",
                     ).permitAll()
                     .anyRequest().authenticated()
             }

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.study.kotlin_board.api.controller.dto.UserCreateCommand
 import org.study.kotlin_board.infrastructure.entity.Users
+import org.junit.jupiter.api.assertThrows as assertThrowsApi
 
 class UsersServiceTest : BehaviorSpec({
     val passwordEncoder = mockk<PasswordEncoder>()
@@ -56,20 +57,33 @@ class UsersServiceTest : BehaviorSpec({
     }
 
     given("이메일 변경 시") {
-        val user = Users(
-            email = "test@test.com",
-            name = "test",
-            passwordHash = "encodedPassword"
-        )
         `when`("중복 되지 않은 이메일로 변경하면") {
+            val user = Users(
+                email = "test@test.com",
+                name = "test",
+                passwordHash = "encodedPassword"
+            )
+            val newEmail = "newemail@test.com"
+            every { usersService.existsByEmail(newEmail) } returns false
+            user.changeEmail(newEmail, usersService)
             then("변경에 성공한다.") {
-
+                user.email shouldBe "newemail@test.com"
             }
         }
 
         `when`("중복되는 이메일로 변경을 하면") {
+            val user = Users(
+                email = "test@test.com",
+                name = "test",
+                passwordHash = "encodedPassword"
+            )
+            val duplicateEmail = "duplicate@test.com"
+            every { usersService.existsByEmail(duplicateEmail) } returns true
             then("변경에 실패한다.") {
-
+                assertThrowsApi<IllegalArgumentException>{
+                    user.changeEmail(duplicateEmail, usersService)
+                }
+                user.email shouldBe "test@test.com"
             }
         }
     }

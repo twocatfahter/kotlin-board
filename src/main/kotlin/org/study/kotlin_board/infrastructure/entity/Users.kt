@@ -10,6 +10,7 @@ import jakarta.persistence.Table
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.study.kotlin_board.api.controller.dto.UserCreateCommand
 import org.study.kotlin_board.api.controller.dto.UserDto
+import org.study.kotlin_board.application.service.UsersService
 import org.study.kotlin_board.global.entity.BaseEntity
 
 @Entity
@@ -19,7 +20,7 @@ class Users(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     @Column(nullable = false)
-    val email: String,
+    var email: String,
     @Column(nullable = false)
     val name: String,
     @Column(nullable = false)
@@ -28,6 +29,13 @@ class Users(
 
     fun validatePassword(rawPassword: String, passwordEncoder: PasswordEncoder): Boolean {
         return passwordEncoder.matches(rawPassword, passwordHash)
+    }
+
+    fun changeEmail(newEmail: String, usersService: UsersService) {
+        if (usersService.existsByEmail(newEmail)) {
+            throw IllegalArgumentException("이미 존재하는 이메일입니다.")
+        }
+        this.email = newEmail
     }
 
     fun toResponse() =

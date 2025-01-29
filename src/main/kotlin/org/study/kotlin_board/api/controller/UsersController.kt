@@ -34,5 +34,5 @@ class UsersController(
         @PathVariable id: Long,
         @Valid @RequestBody request: UserDto.UpdateRequest
     ): ResponseEntity<UserDto.Response> =
-        ResponseEntity.ok(usersFacade.updateUser(request))
+        ResponseEntity.ok(usersFacade.updateUser(id, request))
 }
